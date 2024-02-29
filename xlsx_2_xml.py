@@ -10,8 +10,8 @@ def prettify(elem):
 
 # Load the Excel file
 # (The actual file path would need to be provided here, assuming 'definitions.xlsx' as a placeholder)
-excel_file_path = '/workspaces/diggs-dictionaries/2.5a/DIGGSTestPropertyDefinitions.xlsx'
-xml_file_path = '/mnt/data/dictionary.xml'
+excel_file_path = 'BetaVersion/DIGGSTestPropertyDefinitions.xlsx'
+xml_file_path = 'BetaVersion/test.xlsx'
 
 
 # Read the 'Definitions' and 'AssociatedElements' sheets into Pandas DataFrames
@@ -43,20 +43,21 @@ identifier.text = "DIGGS measurement property classes"
 for _, row in definitions_df.iterrows():
     dictionary_entry = ET.SubElement(root, "dictionaryEntry")
     definition = ET.SubElement(dictionary_entry, "Definition")
-    definition.set("gml:id", row['Code'])
+    definition.set("gml:id", str(row['Code']) if pd.notna(row['Code']) else "")
+
     
     def_description = ET.SubElement(definition, "gml:description")
-    def_description.text = row['Description']
+    def_description.text = str(row['Description']) if pd.notna(row['Description']) else ""
     
     def_identifier = ET.SubElement(definition, "gml:identifier")
     def_identifier.set("codeSpace", "http://diggsml.org/terms")
-    def_identifier.text = row['Name']
+    def_identifier.text = str(row['Name']) if pd.notna(row['Name']) else ""
     
     data_type = ET.SubElement(definition, "dataType")
-    data_type.text = row['Data type']
+    data_type.text = row['Data type'] if pd.notna(row['Data type']) else ""
     
     uom_type = ET.SubElement(definition, "uomType")
-    uom_type.text = row['UOMType']
+    uom_type.text = row['UOMType'] if pd.notna(row['UOMType']) else ""
     
     authority = ET.SubElement(definition, "authority")
     authority.text = row['Authority'] if pd.notna(row['Authority']) else ""
@@ -67,6 +68,7 @@ for _, row in definitions_df.iterrows():
         associated_element = ET.SubElement(definition, "associatedElement")
         associated_element.text = element
 
+print(root)
 # Convert the created XML structure into a string with indentation
 xmlstr = prettify(root)
 
